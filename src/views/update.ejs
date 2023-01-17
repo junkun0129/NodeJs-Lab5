@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 class="title">Update Page</h1>
+
+    <% let nowpage = 0 %> 
+    <div class="contents">
+        <div class="box">
+    
+            <% recipes.forEach((recipe,index) => { %>
+    
+                <div class="each">
+                    <h1 class="name"><%= index+1 %>. <%= recipe.name %> </h1>
+                </div>
+                
+            <% }) %>
+                
+        </div>
+        <div class = "detail">
+          
+
+            <% recipes.forEach((recipe, index) => { %>
+                <div class="each-detail top<%=index%>">
+
+                    <div class="each-detail-name-and-modify">
+                        <h1 class ="name name<%=index%>"><%=recipe.name %></h1>
+                        <h1 class="modify">modify</h1>
+                        <h1 class = "delete">delete</h1>
+                    </div>
+
+                    <h5 class="each-detail-ingredient"><% recipe.ingredient.forEach(element => { %>
+                        <p class="ingredient<%=index%>"><%=element.name %> : <%=element.quantity %>  </p>
+                    <% }) %> </h5>
+                    <%if(recipe.instruction){%>
+                    <h6 class="each-detail-instruction"><% recipe.instruction.forEach(element => { %>
+                        <p class=" instruction<%=index%>"><%=element %> </p>
+                    <% }) %></h6>
+                    <%}%>
+                   
+                    
+                </div>
+            <% }) %>
+
+            
+        </div>
+       
+    </div>
+
+    <div class="hidden">
+
+    </div>
+
+</body>
+<script>
+
+    //show each recipe
+    let zindex = 1
+    const showDetail=(i)=>{
+        let top = document.querySelector(".top"+i);
+        console.log(top)
+        top.style.zIndex = zindex++;
+    }
+  
+    let each = document.querySelectorAll(".each");
+    each.forEach((ea, i)=>{
+        ea.addEventListener("click", ()=>showDetail(i))
+    })
+
+
+    //modify function
+    function changeToUpdate(i){
+        let detail = document.querySelector(".detail");
+        let name = document.querySelector(".name"+i);
+        let ingredient = document.querySelectorAll(".ingredient"+i);
+        let instruction = document.querySelectorAll(".instruction"+i);
+        detail.innerHTML = `
+
+            <%recipes.forEach((recipe, index) => {%>
+                
+            
+                <form class="update-form<%=index%> update-form" action="/recipes/update" method="post">
+                        <div class="each-detail-name-and-modify update-name-and-modify">
+                            <input name = "name" type="text" class ="name name<%=index%> update-name"value = "<%=recipe.name %>"></input type="text">
+                            <button class="update" type="submit">submit</button>
+                        </div>
+                        <h5 class="each-detail-ingredient update-ingredients"><% recipe.ingredient.forEach(element => { %>
+                            <div class="ingredient<%=index%> ingredient">
+                                <input name = "ingredient" type="text" value="<%=element.name %>"> : </input type="text">
+                                <input name = "quantity" type="text" value="  <%=element.quantity %>">  </input type="text">
+                                
+                            </div>
+                        <% }) %> </h5>
+                        <%if(recipe.instruction){%>
+                        <h6 class="each-detail-instruction update-instructions"><% recipe.instruction.forEach(element => { %>
+                            <input type="text" name = "instruction" class=" instruction<%=index%> update-instruction" value="<%=element %> "></input type="text">
+                        <% }) %></h6>
+                        <%}%>
+                        <input name = "id" type = "hidden" value = "<%= recipe.id%>">
+                    </form>
+            
+            <%})%>
+        `;
+        let updateFormAll = document.querySelectorAll(".update-form");
+        updateFormAll.forEach((each, i)=>{
+            each.style.display = "none";
+        })
+        let updateForm = document.querySelector(`.update-form${i}`)
+        console.log(updateForm)
+        updateForm.style.display = "block"
+
+
+    }
+
+    let modifyButton = document.querySelectorAll(".modify");
+    modifyButton.forEach((button, i)=>{
+        button.addEventListener("click", ()=>changeToUpdate(i))
+    })
+
+    let deleteButton = document.querySelectorAll(".delete")
+    deleteButton.forEach((button, i)=>{
+        button.addEventListener("click", ()=>{
+            const response = confirm("are you sure???????/")
+            if(true){
+               
+                let hidden = document.querySelector(".hidden");
+                hidden.innerHTML = `
+                <form action="/recipes/update" method="post">
+                <input type="text" name = "condition" value="ture">
+                <input type="text" name = "id" value = "${i+1}">
+                <button class="deleteDicide" type="submit"></button>
+                </form>
+                `
+
+                let button = document.querySelector(".deleteDicide");
+                button.form.submit();
+                
+            }
+        })
+    })
+    
+</script>
+
+<style>
+    body{
+        background-color: beige;
+        font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+
+
+    .title{
+        width: 200px;
+        height: 80px;
+        color: beige;
+        background-color: rgb(154, 163, 69);
+        outline: 10px solid rgb(154, 163, 69);
+        outline-offset: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 15%;
+        font-size: 20px;
+        margin-top: 30px;
+
+    }
+    .contents{
+        width: 1500px;
+        /* background-color: blue; */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+
+    }
+    .detail{
+        /* background-color: aqua; */
+        width: 800px;
+        height: 530px;
+        position: relative;
+        
+    }
+    .each-detail{
+        padding-left: 30px;
+        position: absolute;
+        background-color: beige;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        /* background-color: white; */
+    }
+
+    .each-detail-name-and-modify{
+        width: 100%;
+        height: 10%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .delete{
+        font-size: 17px;
+        width: 100px;
+        height: 50px;
+        background-color: rgb(108, 104, 33);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        border-radius: 30px;
+        border: none;
+        margin-right: 15%;
+        margin-top: 12px;
+    }
+    .modify{
+        margin-left: 40%;
+        font-size: 17px;
+        width: 100px;
+        height: 50px;
+        background-color: rgb(154, 163, 69);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        border-radius: 30px;
+        border: none;
+    }
+
+    .modify:hover{
+        cursor: pointer;
+    }
+
+    .update{
+        background-color: rgb(154, 163, 69);
+        display: flex;
+        font-size: 17px;
+
+        justify-content: center;
+        align-items: center;
+        color: white;
+        border-radius: 30px;
+        border: none;
+        margin-left: 100px;
+        width: 200px;
+        
+    }
+
+    .name{
+
+    }
+    .each-detail-ingredient{
+        width: 100%;
+        height: 40%;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+    }
+
+    .top0{
+        z-index: 1;
+    }
+    .each-detail-instruction{
+        font-size: 15px;
+        width: 100%;
+        height: 50%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: scroll;
+        overflow-x: hidden;
+        /* background-color: blue; */
+        margin-top: -45px;
+        
+    }
+    .box{
+        position: relative;
+        overflow: scroll;
+        overflow-x: hidden;
+        display: flex;
+        height: 530px;
+        width: 550px;
+        justify-content: center;
+        /* align-items: center; */
+        
+        
+        flex-direction: column;
+        /* background-color: rgb(51, 51, 33); */
+        
+    }
+    .each{
+        width: 500px;
+        height: 75px;
+        color: rgb(104, 103, 103);
+        font-size: smaller;
+        text-align: center;
+    }
+    .each:hover{
+        color: rgb(215, 191, 9);
+        cursor: pointer;
+    }
+    .name{
+        
+    }
+
+
+    /* update CSS */
+    .update-form{
+        /* background-color: rebeccapurple; */
+        height: 500px;
+        position: absolute;
+    }
+
+    .update-name[type="text"]{
+        font-size: 40px;
+        font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    .update-instructions{
+        margin-top: 20px;
+        position: relative;
+        
+    }
+</style>
+</html>
